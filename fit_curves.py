@@ -2,6 +2,9 @@
 // Script for extracting data from text files and fitting them to curves.
 //
 // Example use case:
+//
+// >>> from fit_curves import TDL
+// >>>
 // >>> fit = TDL()
 // >>> fit.read(read_path="file1.log", name="Set1")
 // >>> fit.read(read_path="file2.log", name="Set2")
@@ -22,7 +25,7 @@ class TDL:
         self.legend_entries = []
         self.filepath = filepath
     
-    def gen_plot(self, save_name=None):
+    def generate(self, save_name=None):
         
         #This is the function to which the datapoints will be fitted to.
         def func(Nk, E, α, β):
@@ -52,22 +55,21 @@ class TDL:
         
         if save_name != None:
             plt.savefig(f"{save_name}.png", dpi=300, pad_inches=0.1, bbox_inches='tight')
-        else:
-            plt.show()    
-        
+        else: 
+            plt.savefig(f"no_name.png", dpi=300, pad_inches=0.1, bbox_inches='tight')
 
-    def read(self, read_path, name):
+    def read(self, readpath=None, name=None):
         
-        if read_path != None:
-            filepath = read_path
-        else:
+        if readpath != None:
+            filepath = readpath
+        elif self.filepath != None:
             filepath = self.filepath
+        else:
+            print("Error: Please specify a file path when calling 'read', for example: >>> read(readpath='path/to/file.txt')")
         if name != None:
             filename = name
         else:
             filename = self.filepath
-        
-        print(f"Reading from {filepath}...")
         
         Nk = []
         Ecorr = []
@@ -75,6 +77,7 @@ class TDL:
         Ecorr_lines = []
 
         with open(filepath, 'r') as f:
+            print(f"Reading from {filepath}...")
             text = f.readlines()
             for line in text:
                 if line.find("BE took") != -1:
@@ -100,5 +103,11 @@ class TDL:
         self.Ecorrs.append(Ecorr)
         self.legend_entries.append(filename)
         
+        print(self.Nks)
+        print(self.Ecorrs)
+        print(self.legend_entries)
         print("Done.")
 
+fit = TDL()
+fit.read("kh2_d_1000.log")
+fit.generate()
