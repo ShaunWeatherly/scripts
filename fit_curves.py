@@ -27,15 +27,17 @@ class TDL:
     
     def generate(self, save_name=None):
         
-        #This is the function to which the datapoints will be fitted to.
+        ### This is the function to which the datapoints will be fitted to.
         def func(Nk, E, α, β):
                 return (E + α*(Nk**(-1.0)) + β*(Nk**(-2.0)))
-            
+        ###
+        
         plt.xlabel('N kpt')
         plt.ylabel('Ecorr (Ha)')
         
-        #Sets up range of colors for lines and markers
+        ###Specify color pallet for lines and markers
         color = iter(plt.cm.rainbow(np.linspace(0, 1, len(self.Nks))))
+        ###
         
         for row in range(len(self.Nks)):
             c = next(color)
@@ -103,11 +105,4 @@ class TDL:
         self.Ecorrs.append(Ecorr)
         self.legend_entries.append(filename)
         
-        print(self.Nks)
-        print(self.Ecorrs)
-        print(self.legend_entries)
         print("Done.")
-
-fit = TDL()
-fit.read("kh2_d_1000.log")
-fit.generate()
