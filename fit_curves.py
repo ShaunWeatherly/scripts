@@ -25,19 +25,37 @@ class TDL:
         self.legend_entries = []
         self.filepath = filepath
     
+    ###Quick scatter plot
+    def quickplot(self, save_name=None):
+        
+        #Specify color pallet for lines and markers
+        color = iter(plt.cm.rainbow(np.linspace(0, 1, len(self.Nks))))
+        
+        for row in range(len(self.Nks)):
+            c = next(color)
+            Nk = np.array(self.Nks[row])
+            Ecorr = np.array(self.Ecorrs[row])
+            filename = self.legend_entries[row]
+
+            plt.scatter(Nk, Ecorr, color=c, label=filename)
+            plt.legend()
+
+        if save_name != None:
+            plt.savefig(f"{save_name}.png", dpi=300, pad_inches=0.1, bbox_inches='tight')
+        else: 
+            plt.savefig(f"no_name.png", dpi=300, pad_inches=0.1, bbox_inches='tight')
+            
     def generate(self, save_name=None):
         
-        ### This is the function to which the datapoints will be fitted to.
+        # This is the function to which the datapoints will be fitted to.
         def func(Nk, E, α, β):
                 return (E + α*(Nk**(-1.0)) + β*(Nk**(-2.0)))
-        ###
         
         plt.xlabel('N kpt')
         plt.ylabel('Ecorr (Ha)')
         
-        ###Specify color pallet for lines and markers
+        # Specify color pallet for lines and markers
         color = iter(plt.cm.rainbow(np.linspace(0, 1, len(self.Nks))))
-        ###
         
         for row in range(len(self.Nks)):
             c = next(color)
@@ -68,10 +86,11 @@ class TDL:
             filepath = self.filepath
         else:
             print("Error: Please specify a file path when calling 'read', for example: >>> read(readpath='path/to/file.txt')")
+        
         if name != None:
             filename = name
         else:
-            filename = self.filepath
+            filename = filepath
         
         Nk = []
         Ecorr = []
@@ -106,3 +125,7 @@ class TDL:
         self.legend_entries.append(filename)
         
         print("Done.")
+        
+plot = TDL()
+plot.read("kh2_BE3_k.log")
+plot.quickplot()
