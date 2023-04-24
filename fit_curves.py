@@ -65,7 +65,7 @@ class TDL:
             xspace=np.linspace(1,Nk[-1],500)
             popt, pcov = curve_fit(func, Nk, Ecorr)
             
-            plt.plot(xspace, func(xspace, *popt), color=c, label='TDL Extrapolation: E=%5.3f, α=%5.4f, β=%5.5f' % tuple(popt))
+            plt.plot(xspace, func(xspace, *popt), color=c) #label='Extrap.: E=%5.3f, α=%5.4f, β=%5.5f' % tuple(popt))
             plt.scatter(Nk, Ecorr, color=c, label=filename)
             plt.legend()
             
@@ -100,11 +100,13 @@ class TDL:
         with open(filepath, 'r') as f:
             print(f"Reading from {filepath}...")
             text = f.readlines()
-            for line in text:
-                if line.find("BE took") != -1:
-                    Ecorr_lines.append(int(text.index(line) - 6))
-                if line.find("N kpts") != -1:
-                    Nk_lines.append(int(text.index(line)))
+            for i in range(0,len(text),1):
+                if re.search("BE took", text[i]):
+                    print(f"Found at line: {i}")
+                    Ecorr_lines.append(int(i-6))
+                
+                elif re.search("N kpts", text[i]):
+                    Nk_lines.append(int(i))
 
             if len(Ecorr_lines) == 0:
                 print(f"'CONVERGED' could not be found in file {filepath}")
@@ -119,13 +121,11 @@ class TDL:
                     for word in word_list:
                         if re.search("[0-9]", word):
                             Nk.append(float(word))
-        
+            print(Nk)
+            print(Ecorr)
         self.Nks.append(Nk)
         self.Ecorrs.append(Ecorr)
         self.legend_entries.append(filename)
         
         print("Done.")
         
-plot = TDL()
-plot.read("kh2_BE3_k.log")
-plot.quickplot()
