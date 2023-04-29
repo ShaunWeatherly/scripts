@@ -101,26 +101,31 @@ class TDL:
             print(f"Reading from {filepath}...")
             text = f.readlines()
             for i in range(0,len(text),1):
-                if re.search("BE took", text[i]):
+                if re.search("Time elapsed = ", text[i]):
                     print(f"Found at line: {i}")
-                    Ecorr_lines.append(int(i-6))
+                    Ecorr_lines.append(int(i))
                 
-                elif re.search("N kpts", text[i]):
+                elif re.search("Sweep =", text[i]):
                     Nk_lines.append(int(i))
 
             if len(Ecorr_lines) == 0:
                 print(f"'CONVERGED' could not be found in file {filepath}")
             else:
                 for i in Ecorr_lines:
+                    temp=[]
                     word_list = text[i].split()
                     for word in word_list:
                         if re.search("[0-9]", word):
-                            Ecorr.append(float(word))
+                            temp.append(word)
+                            print(temp)
+                    Ecorr.append(float(temp[1]))
                 for i in Nk_lines:
+                    temp=[]
                     word_list = text[i].split()
                     for word in word_list:
                         if re.search("[0-9]", word):
-                            Nk.append(float(word))
+                            temp.append(word)
+                    Nk.append(float(temp[0]))
             print(Nk)
             print(Ecorr)
         self.Nks.append(Nk)
