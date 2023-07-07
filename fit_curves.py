@@ -16,6 +16,64 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import re
 
+#
+string1 = "Gamma"
+string2 = "E corr"
+
+offset1 = 0
+offset2 = 0
+
+item_number1 = 0
+item_number2 = 0
+
+#Isolated read function
+def read(readpath=None):
+
+    if readpath != None:
+        filepath = readpath
+    else:
+        print("Error: Please specify a file path when calling 'read', for example: >>> read(readpath='path/to/file.txt')")
+
+    xs = []
+    ys = []
+    xs_lines = []
+    ys_lines = []
+
+    with open(filepath, 'r') as f:
+        print(f"Reading from {filepath}...")
+        text = f.readlines()
+        for i in range(0,len(text),1):
+            if re.search(string1, text[i]):
+                #print(f"Found string1 at line: {i}")
+                ys_lines.append(int(i-offset1))
+
+            if re.search(string2, text[i]):
+                #print(f"Found string2 at line: {i}")
+                xs_lines.append(int(i-offset2))
+
+        if len(ys_lines) == 0:
+            print(f"{string2} could not be found in file {filepath}")
+        else:
+            for i in ys_lines:
+                temp=[]
+                word_list = text[i].split()
+                for word in word_list:
+                    if re.search("[0-9]", word):
+                        temp.append(word)
+                ys.append(float(temp[item_number1]))
+            for i in xs_lines:
+                temp=[]
+                word_list = text[i].split()
+                for word in word_list:
+                    if re.search("[0-9]", word):
+                        temp.append(word)
+                xs.append(float(temp[item_number2]))
+        print(xs)
+        print(ys)
+    
+    print("Done.")
+
+
 class TDL:
     
     def __init__(self, filepath = None):
@@ -101,12 +159,12 @@ class TDL:
             print(f"Reading from {filepath}...")
             text = f.readlines()
             for i in range(0,len(text),1):
-                if re.search("Time elapsed = ", text[i]):
+                if re.search("CONVERGED", text[i]):
                     print(f"Found at line: {i}")
-                    Ecorr_lines.append(int(i))
+                    Ecorr_lines.append(int(i-4))
                 
-                elif re.search("Sweep =", text[i]):
-                    Nk_lines.append(int(i))
+                if re.search("CONVERGED", text[i]):
+                    Nk_lines.append(int(i-5))
 
             if len(Ecorr_lines) == 0:
                 print(f"'CONVERGED' could not be found in file {filepath}")
@@ -118,7 +176,7 @@ class TDL:
                         if re.search("[0-9]", word):
                             temp.append(word)
                             print(temp)
-                    Ecorr.append(float(temp[1]))
+                    Ecorr.append(float(temp[0]))
                 for i in Nk_lines:
                     temp=[]
                     word_list = text[i].split()
